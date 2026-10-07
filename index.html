@@ -15,7 +15,9 @@
     <p class="sub">First-pass screening of materials, coating systems and cathodic protection for a corrosive environment.</p>
   </header>
   <main id="main">
-    <form id="form">
+    <aside class="side">
+    <form id="form" novalidate>
+      <h2 class="side-title">Service conditions</h2>
       <label>Environment
         <select name="environment" id="environment"></select>
       </label>
@@ -37,9 +39,9 @@
           </select>
         </label>
       </div>
-      <button type="submit">Find options</button>
-      <button type="button" id="print" class="secondary">Print / save PDF report</button>
       <p id="error" class="error" role="alert"></p>
+      <p class="notes live-note">Results update as you type.</p>
+      <button type="button" id="print">Print / save PDF report</button>
     </form>
 
     <section class="panel" id="galvanic-panel" aria-labelledby="galvanic-title">
@@ -51,9 +53,21 @@
       </div>
       <div id="galvanic-result" aria-live="polite"></div>
     </section>
+    </aside>
 
     <div class="output">
       <div id="report-head" class="print-only"></div>
+      <section class="panel summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Best match</h2>
+        <div id="summary" class="summary-grid"></div>
+        <nav class="jump no-print" aria-label="Jump to section">
+          <a href="#chart-panel">Ashby chart</a>
+          <a href="#group-material">Materials</a>
+          <a href="#group-coating">Coatings</a>
+          <a href="#group-cp">Cathodic protection</a>
+          <a href="#galvanic-panel">Galvanic check</a>
+        </nav>
+      </section>
       <section class="panel" id="chart-panel" aria-labelledby="chart-title">
         <h2 id="chart-title">Ashby chart: materials</h2>
         <div class="row axis-pickers no-print">

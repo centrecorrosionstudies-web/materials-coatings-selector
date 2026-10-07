@@ -2,7 +2,7 @@ import { ASHBY_AXES } from './data.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const TIER_ORDER = ['Strong', 'Suitable', 'Marginal', 'Excluded'];
-const W = 640, H = 420, M = { top: 16, right: 24, bottom: 52, left: 64 };
+const M = { top: 16, right: 24, bottom: 52, left: 64 };
 
 function svg(tag, attrs = {}, text) {
   const n = document.createElementNS(SVG, tag);
@@ -34,6 +34,11 @@ function overlaps(a, b) {
 
 export function renderAshby(container, points, xKey, yKey) {
   const xa = ASHBY_AXES[xKey], ya = ASHBY_AXES[yKey];
+  // Draw at the container's real pixel width so text stays 11px on phones.
+  const W = Math.max(300, Math.min(760, Math.round(container.clientWidth || 640)));
+  const H = Math.round(Math.max(280, Math.min(440, W * 0.62)));
+  const narrow = W < 520;
+  const xTitle = `${narrow ? xa.short : xa.label} · log`, yTitle = `${narrow ? ya.short : ya.label} · log`;
   const xs = logScale(points.map(xa.value), M.left, W - M.right);
   const ys = logScale(points.map(ya.value), H - M.bottom, M.top);
 
@@ -52,8 +57,8 @@ export function renderAshby(container, points, xKey, yKey) {
       svg('text', { x: M.left - 8, y: y + 4, 'text-anchor': 'end' }, fmt(t)));
   }
   grid.append(
-    svg('text', { class: 'axis-title', x: (M.left + W - M.right) / 2, y: H - 10, 'text-anchor': 'middle' }, `${xa.label} · log scale`),
-    svg('text', { class: 'axis-title', transform: `translate(16 ${(M.top + H - M.bottom) / 2}) rotate(-90)`, 'text-anchor': 'middle' }, `${ya.label} · log scale`),
+    svg('text', { class: 'axis-title', x: (M.left + W - M.right) / 2, y: H - 10, 'text-anchor': 'middle' }, xTitle),
+    svg('text', { class: 'axis-title', transform: `translate(16 ${(M.top + H - M.bottom) / 2}) rotate(-90)`, 'text-anchor': 'middle' }, yTitle),
   );
   root.append(grid);
 
@@ -67,6 +72,7 @@ export function renderAshby(container, points, xKey, yKey) {
   const labels = svg('g', { class: 'labels' });
   root.append(marks, labels);
   container.replaceChildren(root, tip);
+  root.addEventListener('click', () => { tip.hidden = true; });
 
   // Dots are obstacles for labels too, so a label never covers another material.
   const placed = points.map((p) => {
@@ -99,10 +105,12 @@ export function renderAshby(container, points, xKey, yKey) {
       tip.style.top = `${Math.max(py - tip.offsetHeight - 10, 0)}px`;
     };
     const hide = () => { tip.hidden = true; };
-    g.addEventListener('mouseenter', show);
+    // Hover is mouse-only; on touch a tap opens the tooltip until the next tap elsewhere.
+    g.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(); });
+    g.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hide(); });
     g.addEventListener('focus', show);
-    g.addEventListener('mouseleave', hide);
-    g.addEventListener('blur', hide);
+    g.addEventListener('blur', (e) => { if (!g.matches(':hover')) hide(); });
+    g.addEventListener('click', (e) => { e.stopPropagation(); show(); });
   }
 
   // Direct-label materials that passed screening, best fit first; a label that

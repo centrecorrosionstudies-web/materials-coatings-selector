@@ -1,6 +1,6 @@
 // Network-first with cache fallback, so the app works offline in the field
 // and picks up new data whenever it is online.
-const CACHE = 'mcs-v1';
+const CACHE = 'mcs-v2';
 const FILES = ['./', 'index.html', 'style.css', 'manifest.webmanifest', 'icon.svg',
   'src/app.js', 'src/engine.js', 'src/data.js', 'src/ashby.js'];
 

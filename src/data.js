@@ -132,11 +132,11 @@ export const HARSH_ENVIRONMENTS = ['marine', 'seawater', 'freshwater', 'soil', '
 
 // Axes available on the Ashby chart. 'value' reads a material record.
 export const ASHBY_AXES = {
-  costPerKg: { label: 'Indicative price (USD/kg)', value: (m) => m.props.costPerKg },
-  strengthMPa: { label: 'Strength (MPa, yield; tensile for FRP/HDPE)', value: (m) => m.props.strengthMPa },
-  densityGcm3: { label: 'Density (g/cm³)', value: (m) => m.props.densityGcm3 },
-  specificStrength: { label: 'Specific strength (MPa per g/cm³)', value: (m) => m.props.strengthMPa / m.props.densityGcm3 },
-  maxTempC: { label: 'Max service temperature (°C)', value: (m) => m.maxTempC },
+  costPerKg: { short: 'Price (USD/kg)', label: 'Indicative price (USD/kg)', value: (m) => m.props.costPerKg },
+  strengthMPa: { short: 'Strength (MPa)', label: 'Strength (MPa, yield; tensile for FRP/HDPE)', value: (m) => m.props.strengthMPa },
+  densityGcm3: { short: 'Density (g/cm³)', label: 'Density (g/cm³)', value: (m) => m.props.densityGcm3 },
+  specificStrength: { short: 'Specific strength', label: 'Specific strength (MPa per g/cm³)', value: (m) => m.props.strengthMPa / m.props.densityGcm3 },
+  maxTempC: { short: 'Max temperature (°C)', label: 'Max service temperature (°C)', value: (m) => m.maxTempC },
 };
 
 export const CP_NOTE = 'Cathodic protection applies to steel in electrolyte (soil or water) and should be combined with a coating.';
