@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Materials &amp; Coatings Selector</title>
+  <meta name="theme-color" content="#0b6e69">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +14,7 @@
     <h1>Materials &amp; Coatings Selector</h1>
     <p class="sub">First-pass screening of materials, coating systems and cathodic protection for a corrosive environment.</p>
   </header>
-  <main>
+  <main id="main">
     <form id="form">
       <label>Environment
         <select name="environment" id="environment"></select>
@@ -35,9 +38,40 @@
         </label>
       </div>
       <button type="submit">Find options</button>
+      <button type="button" id="print" class="secondary">Print / save PDF report</button>
       <p id="error" class="error" role="alert"></p>
     </form>
-    <section id="results" aria-live="polite"></section>
+
+    <section class="panel" id="galvanic-panel" aria-labelledby="galvanic-title">
+      <h2 id="galvanic-title">Galvanic check</h2>
+      <p class="notes">Two metals in electrical contact, in the environment selected above.</p>
+      <div class="row">
+        <label>Metal A<select id="metal-a"></select></label>
+        <label>Metal B<select id="metal-b"></select></label>
+      </div>
+      <div id="galvanic-result" aria-live="polite"></div>
+    </section>
+
+    <div class="output">
+      <div id="report-head" class="print-only"></div>
+      <section class="panel" id="chart-panel" aria-labelledby="chart-title">
+        <h2 id="chart-title">Ashby chart: materials</h2>
+        <div class="row axis-pickers no-print">
+          <label>X axis<select id="x-axis"></select></label>
+          <label>Y axis<select id="y-axis"></select></label>
+        </div>
+        <ul class="legend" aria-label="Legend">
+          <li><span class="key tier-Strong"></span>Strong</li>
+          <li><span class="key tier-Suitable"></span>Suitable</li>
+          <li><span class="key tier-Marginal"></span>Marginal</li>
+          <li><span class="key tier-Excluded"></span>Excluded</li>
+        </ul>
+        <div id="chart" class="chart-wrap"></div>
+        <p class="notes">Indicative mill-product prices and typical properties for comparison only. They vary with product form, grade, region and market.</p>
+        <details class="no-print"><summary>Chart data as a table</summary><table id="chart-table"></table></details>
+      </section>
+      <section id="results" aria-live="polite"></section>
+    </div>
   </main>
   <footer>
     Screening guidance only, based on generalised rules of thumb. Confirm the final selection with a qualified corrosion engineer and the relevant standards (e.g. ISO 12944, NACE/AMPP SP0169, ISO 15589).

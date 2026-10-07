@@ -63,3 +63,41 @@ test('validate rejects bad input', () => {
   assert.throws(() => validate({ ...base, temperatureC: NaN }));
   assert.throws(() => validate({ ...base, budget: 5 }));
 });
+
+import { galvanic, materialPoints } from '../src/engine.js';
+
+test('life-cycle cost index grows with renewals', () => {
+  const r = select({ ...base, environment: 'rural', chloridePpm: 10, lifeYears: 30 });
+  const alkyd = r.coating.find((x) => x.id === 'alkyd');   // typical 12 y -> 2 renewals
+  assert.equal(alkyd.renewals, 2);
+  assert.equal(alkyd.lccIndex, 1 * (1 + 2 * 0.8));
+  const epoxyPu = r.coating.find((x) => x.id === 'epoxy-pu'); // typical 25 y -> 1 renewal
+  assert.equal(epoxyPu.renewals, 1);
+});
+
+test('nickel alloys survive hot acid where stainless does not', () => {
+  const r = select({ ...base, environment: 'acid', ph: 1, chloridePpm: 20000, temperatureC: 90 });
+  assert.ok(ids(r.material).includes('c276'));
+  assert.ok(!ids(r.material).includes('ss316l'));
+});
+
+test('galvanic: steel to stainless fails in seawater, 316L to 2205 is fine', () => {
+  const bad = galvanic('carbon-steel', 'ss316l', 'seawater');
+  assert.equal(bad.compatible, false);
+  assert.equal(bad.anode, 'Carbon steel (bare)');
+  assert.equal(galvanic('ss316l', 'duplex2205', 'seawater').compatible, true);
+});
+
+test('galvanic: limit is looser in rural than marine exposure', () => {
+  assert.equal(galvanic('cuni', 'superduplex', 'rural').compatible, true);   // 0.15 V
+  assert.equal(galvanic('carbon-steel', 'al5083', 'marine').compatible, true); // 0.05 V
+  assert.equal(galvanic('ss304', 'carbon-steel', 'rural').compatible, false);  // 0.35 V
+  assert.throws(() => galvanic('frp', 'ss304', 'rural'));
+});
+
+test('materialPoints covers every material with a tier', () => {
+  const pts = materialPoints(select(base));
+  assert.equal(pts.length, 13);
+  assert.ok(pts.every((p) => p.props.costPerKg > 0 && p.tier));
+  assert.ok(pts.some((p) => p.tier === 'Excluded' && p.reason));
+});

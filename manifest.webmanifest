@@ -1,0 +1,13 @@
+{
+  "name": "Materials & Coatings Selector",
+  "short_name": "Mat Selector",
+  "description": "Screen materials, coatings and cathodic protection for a corrosive environment.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f9",
+  "theme_color": "#0b6e69",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

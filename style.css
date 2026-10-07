@@ -28,3 +28,54 @@ h2 { font-size: 1.05rem; margin: 0 0 8px; }
 .notes, .muted { color: var(--muted); font-size: 0.85rem; }
 details summary { cursor: pointer; color: var(--muted); }
 [hidden] { display: none !important; }
+
+/* Layout: form + galvanic panel in the left column, output on the right */
+main { grid-template-areas: "form output" "galv output"; }
+#form { grid-area: form; }
+#galvanic-panel { grid-area: galv; }
+.output { grid-area: output; min-width: 0; }
+@media (max-width: 760px) { main { grid-template-areas: "form" "output" "galv"; } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.ok { color: var(--accent); font-weight: 600; } .bad { color: var(--bad); font-weight: 600; }
+.lcc { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+/* Ashby chart. Tier colours: one teal ramp, darker = better fit; excluded = hollow grey ring */
+:root { --t-strong: #0b5e59; --t-suitable: #2f9a91; --t-marginal: #8fcfc8; --t-excluded: #9aa3b2; --grid: #e6e9ee; }
+@media (prefers-color-scheme: dark) { :root { --t-strong: #9be7e0; --t-suitable: #3fb8af; --t-marginal: #2a6f6a; --t-excluded: #6b7484; --grid: #2a303b; } }
+.chart-wrap { position: relative; }
+.ashby { width: 100%; height: auto; display: block; overflow: visible; }
+.ashby .grid line { stroke: var(--grid); stroke-width: 1; }
+.ashby text { fill: var(--muted); font-size: 11px; }
+.ashby .axis-title { fill: var(--text); font-size: 12px; }
+.ashby .labels text { fill: var(--text); font-size: 11px; pointer-events: none; }
+.ashby .hit { fill: transparent; }
+.ashby .dot { stroke: var(--card); stroke-width: 2; }
+.ashby .pt { cursor: pointer; outline: none; }
+.ashby .pt:focus .dot, .ashby .pt:hover .dot { r: 7; }
+.tier-Strong .dot, .key.tier-Strong { fill: var(--t-strong); background: var(--t-strong); }
+.tier-Suitable .dot, .key.tier-Suitable { fill: var(--t-suitable); background: var(--t-suitable); }
+.tier-Marginal .dot, .key.tier-Marginal { fill: var(--t-marginal); background: var(--t-marginal); }
+.tier-Excluded .dot { fill: var(--card); stroke: var(--t-excluded); stroke-width: 1.5; }
+.key.tier-Excluded { background: transparent; box-shadow: inset 0 0 0 1.5px var(--t-excluded); }
+.legend { list-style: none; padding: 0; margin: 4px 0 8px; display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--muted); }
+.legend li { display: flex; align-items: center; gap: 6px; }
+.key { -webkit-print-color-adjust: exact; print-color-adjust: exact; width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chart-tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,.12); max-width: 260px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; margin-top: 8px; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+
+/* Print report */
+.print-only { display: none; }
+@media print {
+  :root { --bg: #fff; --card: #fff; --text: #000; --muted: #444; --line: #ccc; }
+  body { font-size: 11pt; }
+  header .sub, #form, #galvanic-panel, .no-print, details { display: none !important; }
+  main { display: block; }
+  .print-only { display: block; }
+  .card, .panel { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  footer { display: block; }
+}
+#report-head dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 0 0 12px; }
+#report-head dt { color: var(--muted); }

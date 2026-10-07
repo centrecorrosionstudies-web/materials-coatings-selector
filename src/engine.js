@@ -1,4 +1,4 @@
-import { CANDIDATES, ENVIRONMENTS } from './data.js';
+import { CANDIDATES, ENVIRONMENTS, RENEWAL_FACTOR, GALVANIC_LIMIT_V, HARSH_ENVIRONMENTS } from './data.js';
 
 const TYPICAL_LIFE_Y = { 3: 25, 2: 12, 1: 4 };
 
@@ -51,8 +51,12 @@ function evaluate(c, input) {
   }
   if (extra.warn) warnings.push(extra.warn);
 
+  // Relative life-cycle cost: initial cost plus renewals needed to reach the design life.
+  const renewals = Math.max(0, Math.ceil(input.lifeYears / typical) - 1);
+  const lccIndex = Math.round(c.cost * (1 + renewals * RENEWAL_FACTOR[c.kind]) * 10) / 10;
+
   score = Math.max(0, Math.round(score));
-  return { item: { id: c.id, kind: c.kind, name: c.name, cost: c.cost, score, tier: tier(score), reasons, warnings, notes: c.notes } };
+  return { item: { id: c.id, kind: c.kind, name: c.name, cost: c.cost, score, tier: tier(score), typicalLifeYears: typical, renewals, lccIndex, reasons, warnings, notes: c.notes } };
 }
 
 export function select(input) {
@@ -65,4 +69,37 @@ export function select(input) {
   }
   for (const k of ['material', 'coating', 'cp']) out[k].sort((a, b) => b.score - a.score || a.cost - b.cost);
   return out;
+}
+
+// Every material, with its screening outcome, for the Ashby chart and data table.
+export function materialPoints(result) {
+  const byId = new Map(result.material.map((m) => [m.id, m]));
+  const excluded = new Map(result.excluded.map((e) => [e.id, e.reason]));
+  return CANDIDATES.filter((c) => c.kind === 'material').map((c) => {
+    const hit = byId.get(c.id);
+    return {
+      id: c.id, name: c.name, short: c.short, props: c.props, maxTempC: c.maxTempC,
+      tier: hit ? hit.tier : 'Excluded', score: hit ? hit.score : null, reason: excluded.get(c.id) ?? null,
+    };
+  });
+}
+
+export const METALS = CANDIDATES.filter((c) => c.kind === 'material' && c.anodicIndexV !== null);
+
+// Galvanic compatibility of two metals in contact, judged on anodic-index difference.
+export function galvanic(aId, bId, environment) {
+  const a = METALS.find((m) => m.id === aId);
+  const b = METALS.find((m) => m.id === bId);
+  if (!a || !b) throw new Error('Both materials must be metals from the list');
+  if (!ENVIRONMENTS[environment]) throw new Error('Unknown environment');
+  const harsh = HARSH_ENVIRONMENTS.includes(environment);
+  const limitV = harsh ? GALVANIC_LIMIT_V.harsh : GALVANIC_LIMIT_V.normal;
+  const diffV = Math.round(Math.abs(a.anodicIndexV - b.anodicIndexV) * 100) / 100;
+  const [anode, cathode] = a.anodicIndexV >= b.anodicIndexV ? [a, b] : [b, a];
+  return {
+    diffV, limitV, harsh,
+    compatible: diffV <= limitV,
+    anode: diffV === 0 ? null : anode.name,
+    cathode: diffV === 0 ? null : cathode.name,
+  };
 }
