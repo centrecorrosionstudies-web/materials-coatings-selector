@@ -1,0 +1,12 @@
+{
+  "name": "materials-coatings-selector",
+  "version": "0.1.0",
+  "description": "Screening tool: material, coating and cathodic protection options for a given corrosive environment",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "python3 -m http.server 8080"
+  },
+  "license": "UNLICENSED"
+}

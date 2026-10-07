@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Materials &amp; Coatings Selector</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Materials &amp; Coatings Selector</h1>
+    <p class="sub">First-pass screening of materials, coating systems and cathodic protection for a corrosive environment.</p>
+  </header>
+  <main>
+    <form id="form">
+      <label>Environment
+        <select name="environment" id="environment"></select>
+      </label>
+      <div class="row">
+        <label>Temperature (&deg;C)<input name="temperatureC" type="number" value="30" step="any" required></label>
+        <label>pH<input name="ph" type="number" value="7" min="0" max="14" step="0.1" required></label>
+      </div>
+      <div class="row">
+        <label>Chloride (ppm)<input name="chloridePpm" id="chloride" type="number" value="500" min="0" step="any" required></label>
+        <label id="resistivity-wrap">Soil resistivity (&Omega;&middot;cm)<input name="resistivityOhmCm" type="number" min="0" step="any" placeholder="optional"></label>
+      </div>
+      <div class="row">
+        <label>Design life (years)<input name="lifeYears" type="number" value="25" min="1" required></label>
+        <label>Budget
+          <select name="budget">
+            <option value="1">Low</option>
+            <option value="2" selected>Medium</option>
+            <option value="3">High</option>
+          </select>
+        </label>
+      </div>
+      <button type="submit">Find options</button>
+      <p id="error" class="error" role="alert"></p>
+    </form>
+    <section id="results" aria-live="polite"></section>
+  </main>
+  <footer>
+    Screening guidance only, based on generalised rules of thumb. Confirm the final selection with a qualified corrosion engineer and the relevant standards (e.g. ISO 12944, NACE/AMPP SP0169, ISO 15589).
+  </footer>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
